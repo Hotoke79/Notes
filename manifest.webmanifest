@@ -1,0 +1,11 @@
+{
+    "name": "Notes",
+    "start_url": "notesPWA.html",
+    "orientation": "portrait",
+    "display": "fullscreen",
+    "icons": [{
+        "src": "Cheng.png",
+        "sizes": "512x512",
+        "type": "image/png"
+    }]
+}

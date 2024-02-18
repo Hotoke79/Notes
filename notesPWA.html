@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+
+<body>
+  <div id="install-screen">
+    <img src="Cheng.png" alt="logo">
+    <p>Todo notes</p>
+    <div>
+      <i id="install-icon" class="material-icons shadow-icon">file_download</i>
+    </div>
+  </div>
+
+  <div id="main-screen">
+    <span id="main-info">All notes</span>
+    <span id="notes-count"></span>
+    <table>
+      <tbody>
+        <!-- <tr>
+          <td class="note-title">
+            Name
+            <br />
+            <span class="note-date">May 15, 2023</span>
+          </td>
+          <td>
+            <i class="material-icons note-del-icon">delete_outlined</i>
+          </td>
+        </tr> -->
+      </tbody>
+    </table>
+    <i id="add-note-icon" class="material-icons shadow-icon" onclick="addNoteIconClick()">add</i>
+  </div>
+  <div id="edit-screen">
+    <i id="back-icon" class="material-icons" onclick="backIconClick()">arrow_back_ios</i>
+    <input type="text" name="" id="" placeholder="Name" onchange="saveNote()">
+    <hr />
+    <textarea name="" id="" cols="30" rows="10" onchange="saveNote()"></textarea>
+  </div>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    #main-screen {
+      display: block;
+    }
+
+    table {
+      font-size: xx-large;
+      width: 100%;
+      margin-top: 15%;
+      float: left;
+    }
+
+    tbody>tr {
+      width: 100%;
+    }
+
+    #main-info,
+    #notes-count {
+      font-size: xx-large;
+      float: left;
+      width: 100%;
+      margin-top: 50%;
+      text-align: center;
+    }
+
+    #notes-count {
+      margin-top: 2.5%;
+      color: gray;
+      font-size: x-large;
+      font-weight: lighter;
+    }
+
+    .shadow-icon {
+      border-radius: 50%;
+      padding: 4.5%;
+      color: #ff3d12;
+      box-shadow: 0px 5px 10px rgba(135, 135, 135 0.5);
+    }
+
+    #add-note-icon {
+      font-size: xx-large;
+      position: absolute;
+      top: 720px;
+      right: 30px;
+      border: 2px solid green;
+
+    }
+
+    .note-title {
+      font-size: x-large;
+      padding-left: 2.5%;
+      width: 90%;
+      padding-top: 6.5%;
+    }
+
+    .note-del-icon {
+      padding-top: 6.5%;
+      font-size: xx-large;
+      color: gray;
+    }
+
+    .note-date {
+      font-size: large;
+      padding-top: 2.5%;
+      float: left;
+      color: grey;
+    }
+
+    #edit-screen {
+      display: none;
+      margin: 5%;
+      margin-top: 10%;
+      min-width: 100%;
+    }
+
+    #back-icon {
+      font-size: xx-large;
+      float: left;
+    }
+
+    input {
+      font-size: xx-large;
+      border: none;
+      outline: none;
+      float: left;
+      width: 80%;
+    }
+
+    hr {
+      width: 100%;
+      float: left;
+      margin-top: 5%;
+      margin-bottom: 10%;
+      border: 1px solid grey;
+    }
+
+    textarea {
+      font-size: x-large;
+      font-family: Arial;
+      width: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      height: 100%;
+    }
+    #install-screen img{
+      display: block;
+      width: 50%;
+      margin: auto;
+      margin-top: 45%;
+      border-radius: 50%;
+    }
+    #install-screen p{
+      font-size: x-large;
+      width: 100%;
+      text-align: center;
+    }
+    #install-screen div{
+      width: 100%;
+      text-align: center;
+    }
+    #install-screen i{
+      font-size: xx-large;
+      margin: auto;
+    }
+    @media all and (display-mode: fullscreen){
+      #install-screen{
+        display: none;
+      }
+      #main-screen{
+        display: block;
+      }
+    }
+  </style>
+
+  <!-- <script src="https://momentjs.com/downloads/moment-with-locales.js"> -->
+  <script src="./moments.js"></script>
+  <script>
+    let input = window.document.querySelector('input')
+    let textarea = window.document.querySelector('textarea')
+    let mainScreen = window.document.querySelector('#main-screen')
+    let editScreen = window.document.querySelector('#edit-screen')
+    let notesCount = document.querySelector('#notes-count')
+    let tableBody = window.document.querySelector('tbody')
+    let installIcon =window.document.querySelector('#install-icon')
+
+    let noteList = []
+    let noteId = - 1
+
+    const removeNoteFromList=(i)=>{
+      noteList.map((el, indx)=>{
+        if(el.id===i) noteList.splice(indx, 1)
+      })
+    window.localStorage.setItem('noteList', JSON.stringify(noteList))
+    window.location.reload()
+    }
+
+    const goToEdit=()=>{
+      mainScreen.style.display = 'none'
+      editScreen.style.display = 'block'
+      noteList.map(el=>{
+        if(el.id===noteId){
+          input.value=el.title
+          textarea.value=el.text
+        }
+      })
+      textarea.focus()
+    }
+    const createNewTableRow = (id, noteTitle, noteDate) => {
+      let row = window.document.createElement('tr')
+      let titleColumn = window.document.createElement('td')
+      let delColumn = window.document.createElement('td')
+      let delIcon = window.document.createElement('i')
+      let date = window.document.createElement('span')
+      //set classes
+      titleColumn.className = 'note-title'
+      date.className = 'note-date'
+      delIcon.className = 'material-icons note-del-icon'
+      //set content
+      date.innerText = noteDate
+      delIcon.innerText = 'delete_outlined'
+      titleColumn.innerText = noteTitle
+      //add handlers
+      titleColumn.addEventListener('click', ()=>{
+        noteId= id
+        goToEdit()
+      })
+      delColumn.addEventListener('click',()=>removeNoteFromList(id))
+      //add elements
+      delColumn.appendChild(delIcon)
+      titleColumn.appendChild(window.document.createElement('br'))
+      titleColumn.appendChild(date)
+      row.appendChild(titleColumn)
+      row.appendChild(delColumn)
+      tableBody.appendChild(row)
+    }
+    const onLoado = () => {
+      noteList = window.localStorage.getItem('noteList')
+        ? JSON.parse(window.localStorage.getItem('noteList'))
+        : []
+      notesCount.innerText = `Notes ${noteList.length}`
+      if (noteList) {
+        noteList.map(el => {
+          createNewTableRow(el.id, el.title, el.date)
+          //console.log(el)
+        })
+      }
+    }
+    onLoado()
+
+    const getTitleSlise = (ttl, strLength=20)=>{
+      if(ttl.length > strLength){
+        return `${ttl.substr(0, strLength)}...`
+      }else return ttl
+    }
+
+    const updateNote = () => {
+      noteList.map(el=>{
+        if(el.id===noteId){
+          el.title=getTitleSlise(input.value)
+          el.text=textarea.value
+        }
+      })
+    }
+
+    const createNewNote = () => {
+      let date = moment(new Date())
+      let object = {
+        id: noteList.length,
+        title: input.value
+        ? getTitleSlise(input.value)
+        : getTitleSlise(textarea.value),
+        text: textarea.value,
+        date: date.format('LL')
+      }
+      noteList.push(object)
+    }
+    const backIconClick = () => {
+      mainScreen.style.display = 'block'
+      editScreen.style.display = 'none'
+      noteId = -1
+      window.location.reload()
+    }
+    const saveNote = () => {
+      if (textarea.value) {
+        if (noteId < 0) createNewNote()
+        else updateNote()
+        window.localStorage.setItem('noteList', JSON.stringify(noteList))
+      }
+    }
+    const addNoteIconClick = () => {
+      mainScreen.style.display = 'none'
+      editScreen.style.display = 'block'
+    }
+
+    let defaultInstallEvent = null
+    window.addEventListener('beforeinstallprompt', (event)=>{
+      event.preventDefault()
+      defaultInstallEvent=event
+    })
+    installIcon.addEventListener('click', (event)=>{
+      defaultInstallEvent.prompt()
+    })
+  </script>
+</body>
+
+</html>
